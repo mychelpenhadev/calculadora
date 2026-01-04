@@ -2,24 +2,52 @@ let input = document.getElementById('inputBox');
 let buttons = document.querySelectorAll('button');
 
 let string = "";
+let resultDisplayed = false;
 let arr = Array.from(buttons);
+
 arr.forEach(button => {
     button.addEventListener('click', (e) => {
-        if (e.target.innerHTML == '=') {
-            string = eval(string);
-            input.value = string;
-        }
+        let btnValue = e.target.innerHTML;
 
-        else if (e.target.innerHTML == 'AC') {
+        if (btnValue == '=') {
+            try {
+                if (string === "") {
+                    input.value = "";
+                    return;
+                }
+                let cleanString = string.replace(/\b0+(?=\d)/g, '');
+                string = String(eval(cleanString));
+                input.value = string;
+                resultDisplayed = true;
+            } catch (error) {
+                input.value = "Erro";
+                string = "";
+                resultDisplayed = false;
+            }
+        }
+        else if (btnValue == 'AC') {
             string = "";
             input.value = string;
+            resultDisplayed = false;
         }
-        else if(e.target.innerHTML == 'DEL'){
+        else if (btnValue == 'DEL') {
+            if (resultDisplayed) {
+                resultDisplayed = false;
+            }
             string = string.substring(0, string.length - 1);
             input.value = string;
         }
         else {
-            string += e.target.innerHTML;
+            if (resultDisplayed) {
+                if (['+', '-', '*', '/', '%'].includes(btnValue)) {
+                    resultDisplayed = false;
+                } else {
+                    string = "";
+                    resultDisplayed = false;
+                }
+            }
+
+            string += btnValue;
             input.value = string;
         }
     });
